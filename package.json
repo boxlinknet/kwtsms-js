@@ -1,0 +1,58 @@
+{
+  "name": "kwtsms",
+  "version": "0.1.0",
+  "description": "JavaScript/TypeScript client for the kwtSMS SMS API (kwtsms.com). Send SMS, validate numbers, check balance. Zero runtime dependencies.",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "kwtsms": "dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "node --import tsx/esm --test 'test/**/*.test.ts'",
+    "test:unit": "node --import tsx/esm --test test/phone.test.ts test/message.test.ts test/errors.test.ts",
+    "test:integration": "node --import tsx/esm --test test/integration.test.ts",
+    "prepublishOnly": "npm run build && npm run test:unit"
+  },
+  "keywords": [
+    "kwtsms",
+    "sms",
+    "kuwait",
+    "api",
+    "client",
+    "typescript"
+  ],
+  "author": "boxlinknet",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boxlinknet/kwtsms-js.git"
+  },
+  "homepage": "https://github.com/boxlinknet/kwtsms-js#readme",
+  "bugs": {
+    "url": "https://github.com/boxlinknet/kwtsms-js/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

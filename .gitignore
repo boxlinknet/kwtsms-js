@@ -1,0 +1,20 @@
+# Build output
+dist/
+
+# Credentials — NEVER commit
+.env
+
+# Logs
+*.log
+kwtsms.log
+
+# Node
+node_modules/
+.npm
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
