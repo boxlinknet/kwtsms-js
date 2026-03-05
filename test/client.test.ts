@@ -94,6 +94,19 @@ class TestKwtSMS extends KwtSMS {
       } as SendResult;
     }
 
+    // Empty message after cleaning — return locally without hitting API
+    const { cleanMessage } = await import('../src/message.ts');
+    const cleaned = cleanMessage(message);
+    if (!cleaned) {
+      return {
+        result: 'ERROR' as const,
+        code: 'ERR009',
+        description: 'Message is empty after cleaning. If your message contained only emojis or HTML, remove them.',
+        action: 'Provide a non-empty message text.',
+        ...(invalid.length > 0 ? { invalid } : {}),
+      } as SendResult;
+    }
+
     // Record the API call we would have made
     this.calls.push({ endpoint: 'send', payload: { mobile: validNumbers.join(','), message } });
 
@@ -201,6 +214,13 @@ describe('send() — local validation (no API call made)', () => {
     assert.equal(result.result, 'ERROR');
     assert.equal((result as SendResult).code, 'ERR_INVALID_INPUT');
     assert.equal(sms.calls.length, 0);
+  });
+
+  test('emoji-only message returns ERR009 without API call', async () => {
+    const result = await sms.send('96598765432', '🎉🎊🎈') as SendResult;
+    assert.equal(result.result, 'ERROR');
+    assert.equal(result.code, 'ERR009');
+    assert.equal(sms.calls.length, 0, 'API should NOT be called for empty message');
   });
 });
 

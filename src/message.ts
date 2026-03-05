@@ -27,8 +27,11 @@ const HIDDEN_CHARS = new Set([
 
 function isEmojiCodePoint(cp: number): boolean {
   return (
-    (cp >= 0x1f600 && cp <= 0x1f64f) ||
+    (cp >= 0x1f000 && cp <= 0x1f02f) ||  // Mahjong tiles, domino tiles
+    (cp >= 0x1f0a0 && cp <= 0x1f0ff) ||  // Playing cards
+    (cp >= 0x1f1e0 && cp <= 0x1f1ff) ||  // Regional indicator symbols (flags)
     (cp >= 0x1f300 && cp <= 0x1f5ff) ||
+    (cp >= 0x1f600 && cp <= 0x1f64f) ||
     (cp >= 0x1f680 && cp <= 0x1f6ff) ||
     (cp >= 0x1f700 && cp <= 0x1f77f) ||
     (cp >= 0x1f780 && cp <= 0x1f7ff) ||
@@ -36,9 +39,11 @@ function isEmojiCodePoint(cp: number): boolean {
     (cp >= 0x1f900 && cp <= 0x1f9ff) ||
     (cp >= 0x1fa00 && cp <= 0x1fa6f) ||
     (cp >= 0x1fa70 && cp <= 0x1faff) ||
-    (cp >= 0x2600 && cp <= 0x26ff) ||
-    (cp >= 0x2700 && cp <= 0x27bf) ||
-    (cp >= 0xfe00 && cp <= 0xfe0f)
+    (cp >= 0x2600  && cp <= 0x26ff)  ||
+    (cp >= 0x2700  && cp <= 0x27bf)  ||
+    (cp >= 0xfe00  && cp <= 0xfe0f)  ||  // Variation selectors
+    cp === 0x20e3                    ||  // Combining enclosing keycap
+    (cp >= 0xe0000 && cp <= 0xe007f)     // Tags block (subdivision flags)
   );
 }
 
