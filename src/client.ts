@@ -330,21 +330,23 @@ export class KwtSMS {
       } as SendResult;
     }
 
+    // Pre-flight: clean message and reject if empty (e.g. emoji-only input)
+    const cleaned = cleanMessage(message);
+    if (!cleaned) {
+      return {
+        result: 'ERROR' as const,
+        code: 'ERR009',
+        description: 'Message is empty after cleaning. If your message contained only emojis or HTML, remove them.',
+        action: 'Provide a non-empty message text.',
+        ...(invalid.length > 0 ? { invalid } : {}),
+      } as SendResult;
+    }
+
     let result: SendResult | BulkSendResult;
 
     if (validNumbers.length > BATCH_SIZE) {
-      result = await this._sendBulk(validNumbers, message, effectiveSender);
+      result = await this._sendBulk(validNumbers, cleaned, effectiveSender);
     } else {
-      const cleaned = cleanMessage(message);
-      if (!cleaned) {
-        return {
-          result: 'ERROR' as const,
-          code: 'ERR009',
-          description: 'Message is empty after cleaning. If your message contained only emojis or HTML, remove them.',
-          action: 'Provide a non-empty message text.',
-          ...(invalid.length > 0 ? { invalid } : {}),
-        } as SendResult;
-      }
       const payload = {
         ...this._creds,
         sender: effectiveSender,
@@ -386,7 +388,6 @@ export class KwtSMS {
     message: string,
     sender: string,
   ): Promise<BulkSendResult> {
-    const cleanedMsg = cleanMessage(message);
     const batches: string[][] = [];
     for (let i = 0; i < numbers.length; i += BATCH_SIZE) {
       batches.push(numbers.slice(i, i + BATCH_SIZE));
@@ -404,7 +405,7 @@ export class KwtSMS {
         ...this._creds,
         sender,
         mobile: batch.join(','),
-        message: cleanedMsg,
+        message,
         test: this.testMode ? '1' : '0',
       };
 
