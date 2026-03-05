@@ -71,8 +71,14 @@ export class KwtSMS {
   readonly logFile: string;
 
   /** Cached balance from last verify() / send() call. */
-  _cachedBalance: number | null = null;
-  _cachedPurchased: number | null = null;
+  private _cachedBalance: number | null = null;
+  private _cachedPurchased: number | null = null;
+
+  /** Available balance from the last verify() or send() call. */
+  get cachedBalance(): number | null { return this._cachedBalance; }
+
+  /** Purchased credits from the last verify() call. */
+  get cachedPurchased(): number | null { return this._cachedPurchased; }
 
   /**
    * Create a KwtSMS client.
@@ -337,7 +343,7 @@ export class KwtSMS {
     }
 
     if (invalid.length > 0) {
-      (result as SendResult).invalid = invalid;
+      (result as SendResult | BulkSendResult).invalid = invalid;
     }
 
     return result;
@@ -406,6 +412,13 @@ export class KwtSMS {
           batch: i + 1,
           code: String(data.code ?? 'UNKNOWN'),
           description: String(data.description ?? 'Unknown error'),
+        });
+      } else if (data !== null) {
+        // Unexpected result value — record as error so the batch is not silently dropped
+        errors.push({
+          batch: i + 1,
+          code: 'UNKNOWN',
+          description: `Unexpected API result: ${String(data?.result ?? 'null')}`,
         });
       }
 

@@ -93,5 +93,5 @@ export function cleanMessage(text: string): string {
   }
 
   // 5. Strip HTML tags (after character-level processing)
-  return result.join('').replace(/<[^>]+>/g, '');
+  return result.join('').replace(/<[^>]*>/g, '');
 }

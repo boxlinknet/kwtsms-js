@@ -13,7 +13,7 @@
  */
 
 import { createInterface } from 'node:readline';
-import { existsSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, writeFileSync } from 'node:fs';
 import { KwtSMS, type BulkSendResult } from './client.js';
 import { loadEnvFile } from './env.js';
 import { apiRequest } from './request.js';
@@ -97,7 +97,7 @@ async function runSetup(envFile = '.env'): Promise<void> {
   // Verify credentials
   process.stdout.write('\nVerifying credentials... ');
   try {
-    const data = await apiRequest('balance', { username, password });
+    const data = await apiRequest('balance', { username, password }); // logFile intentionally omitted — setup calls are not logged
     if (data.result !== 'OK') {
       console.log(`FAILED\nError: ${String(data.description ?? data.code ?? 'Unknown error')}`);
       process.exit(1);
@@ -112,7 +112,7 @@ async function runSetup(envFile = '.env'): Promise<void> {
   process.stdout.write('Fetching Sender IDs... ');
   let senderIds: string[] = [];
   try {
-    const sidData = await apiRequest('senderid', { username, password });
+    const sidData = await apiRequest('senderid', { username, password }); // logFile intentionally omitted — setup calls are not logged
     if (sidData.result === 'OK') {
       senderIds = (sidData['senderid'] as string[]) ?? [];
     }
@@ -176,6 +176,8 @@ async function runSetup(envFile = '.env'): Promise<void> {
 
   try {
     writeFileSync(envFile, content, 'utf8');
+    try { chmodSync(envFile, 0o600); } catch { /* ignore on Windows */ }
+    console.log(`  Tip: add "${envFile}" to your .gitignore to avoid committing credentials.`);
   } catch (e) {
     console.error(`\nError writing ${envFile}: ${(e as Error).message}`);
     process.exit(1);
@@ -250,7 +252,7 @@ async function main(): Promise<void> {
   if (cmd === 'verify') {
     const [ok, bal, err] = await sms.verify();
     if (ok) {
-      const purchased = sms._cachedPurchased;
+      const purchased = sms.cachedPurchased;
       console.log(`  Credentials valid  |  Available: ${bal}  |  Purchased: ${purchased}`);
       if (sms.testMode) console.log('  Mode: TEST (messages will not be delivered)');
     } else {
@@ -261,7 +263,7 @@ async function main(): Promise<void> {
   } else if (cmd === 'balance') {
     const [ok, bal, err] = await sms.verify();
     if (ok) {
-      const purchased = sms._cachedPurchased;
+      const purchased = sms.cachedPurchased;
       console.log(`  Available: ${bal}  |  Purchased: ${purchased}`);
     } else {
       console.error(`  Could not retrieve balance: ${err}`);

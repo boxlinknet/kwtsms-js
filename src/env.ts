@@ -21,14 +21,23 @@ export function loadEnvFile(filePath = '.env'): Record<string, string> {
     const eqIndex = trimmed.indexOf('=');
     if (eqIndex < 0) continue;
     const key = trimmed.slice(0, eqIndex).trim();
-    let value = trimmed.slice(eqIndex + 1).trim();
-    // Strip surrounding quotes (single or double)
+    const rawValue = trimmed.slice(eqIndex + 1).trim();
+    let value: string;
+
     if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
+      (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+      (rawValue.startsWith("'") && rawValue.endsWith("'"))
     ) {
-      value = value.slice(1, -1);
+      // Quoted value: strip quotes, preserve everything inside including # characters
+      value = rawValue.slice(1, -1);
+    } else {
+      // Unquoted value: strip inline comments (# and everything after, with preceding spaces)
+      const commentIdx = rawValue.indexOf(' #');
+      value = commentIdx >= 0 ? rawValue.slice(0, commentIdx) : rawValue;
+      // Also handle # at start (no space before it)
+      if (value.startsWith('#')) value = '';
     }
+
     if (key) result[key] = value;
   }
   return result;
