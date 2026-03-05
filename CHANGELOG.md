@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-03-05
+
+### Added
+
+- `examples/06-otp-production/` — production-ready OTP flow with bcrypt hashing, two-tier sliding-window rate limiting, and CAPTCHA support
+  - Core service (`otp-service.ts`): `sendOtp()` and `verifyOtp()` with 13-step security pipeline
+  - DB adapters: in-memory, SQLite (better-sqlite3, WAL), Drizzle ORM, Prisma
+  - CAPTCHA adapters: Cloudflare Turnstile, hCaptcha (stdlib-only HTTP, 5s timeout, fail-safe false)
+  - Framework wiring: node:http, Express, Fastify, Next.js App Router, Hono, NestJS, TanStack Start, Astro, SvelteKit
+  - Companion `README.md` covering all DB options, CAPTCHA setup, rate limiting, framework table, security checklist, and common mistakes
+
+### Fixed
+
+- `examples/06-otp-production/usage/node-http.ts`: added 4 KB body size limit to prevent DoS
+- `examples/06-otp-production/usage/nextjs.ts`: documented both send and verify POST handler exports in separate route files
+- `examples/06-otp-production/adapters/drizzle.ts`: header clarified to SQLite schema (not DB-agnostic)
+- `README.md`: removed em dashes used as prose separators
+
+## [0.2.0] - 2026-03-05
+
 ## [0.1.0] - 2026-03-05
 
 Initial release of the `kwtsms` JavaScript/TypeScript client library.
