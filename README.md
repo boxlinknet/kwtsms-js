@@ -16,7 +16,7 @@ pnpm add kwtsms
 bun add kwtsms
 ```
 
-Works in Node.js 16+, Bun, Next.js, and any JavaScript/TypeScript runtime.
+Works in Node.js 16+ and Bun. Uses Node.js built-in modules (`node:https`, `node:fs`).
 
 ## Quick Start
 
