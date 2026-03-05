@@ -43,13 +43,24 @@ export interface SendResult extends ApiResponse {
 export interface BulkSendResult {
   result: 'OK' | 'PARTIAL' | 'ERROR';
   bulk: true;
+  /** Number of batches sent (each batch is up to 200 numbers). */
   batches: number;
+  /** Total number of recipients across all successful batches. */
   numbers: number;
+  /** Total SMS credits consumed across all successful batches. */
   'points-charged': number;
+  /** Available balance after the last successful batch, or null if all batches failed. */
   'balance-after': number | null;
+  /** Message IDs for each successful batch. */
   'msg-ids': string[];
+  /** Per-batch error details for failed batches. */
   errors: Array<{ batch: number; code: string; description: string }>;
+  /** Numbers that failed local pre-validation (never sent to API). */
   invalid?: InvalidEntry[];
+  /** Error code from first failed batch — mirrors SendResult shape for uniform error handling. */
+  code?: string;
+  /** Error description from first failed batch — mirrors SendResult shape for uniform error handling. */
+  description?: string;
 }
 
 export interface ValidateResult {
@@ -441,7 +452,7 @@ export class KwtSMS {
     const overall: 'OK' | 'PARTIAL' | 'ERROR' =
       okCount === batches.length ? 'OK' : okCount === 0 ? 'ERROR' : 'PARTIAL';
 
-    return {
+    const bulkResult: BulkSendResult = {
       result: overall,
       bulk: true,
       batches: batches.length,
@@ -451,5 +462,12 @@ export class KwtSMS {
       'msg-ids': msgIds,
       errors,
     };
+
+    if (errors.length > 0) {
+      bulkResult.code = errors[0].code;
+      bulkResult.description = errors[0].description;
+    }
+
+    return bulkResult;
   }
 }
