@@ -64,11 +64,22 @@ export interface BulkSendResult {
 }
 
 export interface ValidateResult {
+  /** Numbers validated OK by the API. Normalised format (digits only, no prefix). */
   ok: string[];
+  /**
+   * Invalid numbers. Mixed format:
+   * - Numbers rejected by the API appear in normalised format (digits only).
+   * - Numbers rejected by local pre-validation appear as the original input string.
+   * Use `rejected` for structured details on locally-rejected entries.
+   */
   er: string[];
+  /** Numbers with no route. Normalised format. */
   nr: string[];
+  /** Raw API response, or null if the API was not called. */
   raw: ApiResponse | null;
+  /** Error message if the API call failed, or null on success. */
   error: string | null;
+  /** Details for numbers rejected by local validation before the API call. */
   rejected: InvalidEntry[];
 }
 
