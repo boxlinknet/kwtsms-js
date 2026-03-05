@@ -82,8 +82,11 @@ class TestKwtSMS extends KwtSMS {
       }
     }
 
+    // Deduplicate normalised numbers (mirrors client.ts behaviour)
+    const uniqueValid = [...new Set(validNumbers)];
+
     // All invalid — return locally without hitting API
-    if (validNumbers.length === 0) {
+    if (uniqueValid.length === 0) {
       const desc =
         invalid.length === 1
           ? invalid[0].error
@@ -108,7 +111,7 @@ class TestKwtSMS extends KwtSMS {
     }
 
     // Record the API call we would have made
-    this.calls.push({ endpoint: 'send', payload: { mobile: validNumbers.join(','), message } });
+    this.calls.push({ endpoint: 'send', payload: { mobile: uniqueValid.join(','), message } });
 
     const data = this._mockResponse;
     let result: SendResult;
@@ -295,5 +298,18 @@ describe('send() — mixed valid + invalid numbers', () => {
     assert.equal(inv?.length, 2, 'abc and empty string should be in invalid');
     // Valid number should have been sent (recorded as API call)
     assert.equal(sms.calls.length, 1, 'API should be called once for valid numbers');
+  });
+});
+
+describe('send() — deduplication', () => {
+  test('deduplicates normalised numbers — sends each number only once', async () => {
+    const sms = new TestKwtSMS('user', 'pass', { logFile: '' });
+    sms.setResponse({ result: 'OK', 'msg-id': 'x1', numbers: 1, 'points-charged': 1, 'balance-after': 99 });
+    sms.resetCalls();
+    // +96598765432 and 0096598765432 both normalise to 96598765432
+    const result = await sms.send(['+96598765432', '0096598765432'], 'hello') as SendResult;
+    assert.equal(result.result, 'OK');
+    assert.equal(sms.calls.length, 1, 'API should be called exactly once');
+    assert.equal(sms.calls[0].payload.mobile, '96598765432', 'only one normalised number sent');
   });
 });
