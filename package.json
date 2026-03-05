@@ -40,7 +40,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/boxlinknet/kwtsms-js.git"
+    "url": "git+https://github.com/boxlinknet/kwtsms-js.git"
   },
   "homepage": "https://github.com/boxlinknet/kwtsms-js#readme",
   "bugs": {
