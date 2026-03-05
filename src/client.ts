@@ -65,14 +65,14 @@ export interface ValidateResult {
 
 export class KwtSMS {
   readonly username: string;
-  readonly password: string;
+  #password: string;
   readonly senderId: string;
   readonly testMode: boolean;
   readonly logFile: string;
 
   /** Cached balance from last verify() / send() call. */
-  private _cachedBalance: number | null = null;
-  private _cachedPurchased: number | null = null;
+  protected _cachedBalance: number | null = null;
+  protected _cachedPurchased: number | null = null;
 
   /** Available balance from the last verify() or send() call. */
   get cachedBalance(): number | null { return this._cachedBalance; }
@@ -92,7 +92,7 @@ export class KwtSMS {
       throw new Error('username and password are required');
     }
     this.username = username;
-    this.password = password;
+    this.#password = password;
     this.senderId = options.senderId ?? 'KWT-SMS';
     this.testMode = options.testMode ?? false;
     this.logFile = options.logFile ?? 'kwtsms.log';
@@ -128,7 +128,7 @@ export class KwtSMS {
   }
 
   private get _creds(): Record<string, string> {
-    return { username: this.username, password: this.password };
+    return { username: this.username, password: this.#password };
   }
 
   // ── verify ────────────────────────────────────────────────────────────────

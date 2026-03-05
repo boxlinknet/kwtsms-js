@@ -141,6 +141,11 @@ describe('KwtSMS constructor', () => {
     assert.equal(sms.testMode, true);
     assert.equal(sms.logFile, '');
   });
+
+  test('password is not accessible as a public property', () => {
+    const sms = new KwtSMS('user', 'pass');
+    assert.equal(('password' in sms), false, 'password must not be a public enumerable property');
+  });
 });
 
 // ── verify() ──────────────────────────────────────────────────────────────────
