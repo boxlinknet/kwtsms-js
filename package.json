@@ -47,7 +47,7 @@
     "url": "https://github.com/boxlinknet/kwtsms-js/issues"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
