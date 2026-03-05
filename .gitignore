@@ -1,6 +1,9 @@
 # Build output
 dist/
 
+# Internal docs — not for public
+docs/
+
 # Credentials — NEVER commit
 .env
 
