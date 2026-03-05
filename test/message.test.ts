@@ -102,3 +102,27 @@ describe('cleanMessage', () => {
     assert.ok(!result.includes('\uD83C'));
   });
 });
+
+describe('cleanMessage — extended emoji ranges', () => {
+  test('strips US flag regional indicators U+1F1FA + U+1F1F8', () => {
+    // 🇺🇸 is two regional indicator symbols
+    const result = cleanMessage('Hello \u{1F1FA}\u{1F1F8}');
+    assert.equal(result, 'Hello ');
+  });
+
+  test('strips keycap combining char U+20E3', () => {
+    // variation selector + keycap stripped, base # preserved
+    const result = cleanMessage('#\uFE0F\u20E3');
+    assert.equal(result, '#');
+  });
+
+  test('strips mahjong tile U+1F004', () => {
+    const result = cleanMessage('game \u{1F004}');
+    assert.equal(result, 'game ');
+  });
+
+  test('strips tags block char U+E0067 (subdivision flags)', () => {
+    const result = cleanMessage('test \u{E0067}');
+    assert.equal(result, 'test ');
+  });
+});

@@ -335,11 +335,21 @@ export class KwtSMS {
     if (validNumbers.length > BATCH_SIZE) {
       result = await this._sendBulk(validNumbers, message, effectiveSender);
     } else {
+      const cleaned = cleanMessage(message);
+      if (!cleaned) {
+        return {
+          result: 'ERROR' as const,
+          code: 'ERR009',
+          description: 'Message is empty after cleaning. If your message contained only emojis or HTML, remove them.',
+          action: 'Provide a non-empty message text.',
+          ...(invalid.length > 0 ? { invalid } : {}),
+        } as SendResult;
+      }
       const payload = {
         ...this._creds,
         sender: effectiveSender,
         mobile: validNumbers.join(','),
-        message: cleanMessage(message),
+        message: cleaned,
         test: this.testMode ? '1' : '0',
       };
       try {
