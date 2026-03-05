@@ -24,18 +24,25 @@ export function loadEnvFile(filePath = '.env'): Record<string, string> {
     const rawValue = trimmed.slice(eqIndex + 1).trim();
     let value: string;
 
-    if (
-      (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
-      (rawValue.startsWith("'") && rawValue.endsWith("'"))
-    ) {
+    // Check for properly matched quotes (same char at start and end, length >= 2)
+    const firstChar = rawValue[0];
+    const lastChar = rawValue[rawValue.length - 1];
+    const isDoubleQuoted = firstChar === '"' && lastChar === '"' && rawValue.length >= 2;
+    const isSingleQuoted = firstChar === "'" && lastChar === "'" && rawValue.length >= 2;
+
+    if (isDoubleQuoted || isSingleQuoted) {
       // Quoted value: strip quotes, preserve everything inside including # characters
       value = rawValue.slice(1, -1);
     } else {
-      // Unquoted value: strip inline comments (# and everything after, with preceding spaces)
-      const commentIdx = rawValue.indexOf(' #');
-      value = commentIdx >= 0 ? rawValue.slice(0, commentIdx) : rawValue;
+      // Unquoted value: strip inline comments (space OR tab followed by # and everything after)
+      const commentMatch = rawValue.search(/[ \t]#/);
+      value = commentMatch >= 0 ? rawValue.slice(0, commentMatch) : rawValue;
       // Also handle # at start (no space before it)
       if (value.startsWith('#')) value = '';
+      // Strip a leading unmatched quote character
+      if ((value.startsWith('"') || value.startsWith("'")) && value[0] !== value[value.length - 1]) {
+        value = value.slice(1);
+      }
     }
 
     if (key) result[key] = value;
