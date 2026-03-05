@@ -46,6 +46,11 @@ function getClientIp(): string {
 
 // ── Server functions ──────────────────────────────────────────────────────────
 
+// NOTE: createServerFn() does not set HTTP response status codes.
+// The returned result object is serialised and sent as 200 OK.
+// Check result.success and result.retryAfter on the CLIENT side:
+//   const result = await sendOtpFn({ data: { phone } });
+//   if (!result.success && result.retryAfter) { /* show retry message */ }
 export const sendOtpFn = createServerFn({ method: 'POST' })
   .validator((data: { phone: unknown; captchaToken?: string }) => data)
   .handler(async ({ data }) => {
