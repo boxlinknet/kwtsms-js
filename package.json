@@ -24,7 +24,7 @@
   "scripts": {
     "build": "tsup",
     "test": "node --import tsx/esm --test 'test/**/*.test.ts'",
-    "test:unit": "node --import tsx/esm --test test/phone.test.ts test/message.test.ts test/errors.test.ts",
+    "test:unit": "node --import tsx/esm --test test/phone.test.ts test/message.test.ts test/errors.test.ts test/client.test.ts",
     "test:integration": "node --import tsx/esm --test test/integration.test.ts",
     "prepublishOnly": "npm run build && npm run test:unit"
   },
