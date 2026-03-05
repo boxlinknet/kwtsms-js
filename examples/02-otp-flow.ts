@@ -12,7 +12,7 @@
  *   npx tsx examples/02-otp-flow.ts
  */
 
-import { KwtSMS } from '../src/index.js';
+import { KwtSMS, normalizePhone } from '../src/index.js';
 import { randomInt } from 'node:crypto';
 
 // ── OTP store ─────────────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ async function sendOtp(
   phone: string,
 ): Promise<{ success: boolean; error?: string; resendIn?: number }> {
   const now = Date.now();
-  const existing = otpStore.get(phone);
+  const existing = otpStore.get(normalizePhone(phone));
 
   // Enforce resend cooldown
   if (existing && now < existing.resendAllowedAt) {
@@ -68,7 +68,7 @@ async function sendOtp(
   }
 
   // Invalidate previous code (generate new one, old one is gone)
-  otpStore.set(phone, {
+  otpStore.set(normalizePhone(phone), {
     code,
     expiresAt: now + OTP_TTL_MS,
     resendAllowedAt: now + RESEND_COOLDOWN_MS,
@@ -84,7 +84,7 @@ function verifyOtp(
   phone: string,
   input: string,
 ): { success: boolean; error?: string } {
-  const record = otpStore.get(phone);
+  const record = otpStore.get(normalizePhone(phone));
 
   if (!record) {
     return { success: false, error: 'No OTP requested for this number' };
@@ -95,7 +95,7 @@ function verifyOtp(
   }
 
   if (Date.now() > record.expiresAt) {
-    otpStore.delete(phone); // clean up
+    otpStore.delete(normalizePhone(phone)); // clean up
     return { success: false, error: 'Code expired — request a new one' };
   }
 
@@ -129,7 +129,7 @@ if (!sendResult.success) {
 console.log('   OTP sent successfully');
 
 // 2. Show what was stored (never do this in production — just for demo)
-const stored = otpStore.get(PHONE)!;
+const stored = otpStore.get(normalizePhone(PHONE))!;
 console.log(`   Code stored: ${stored.code}`);
 console.log(`   Expires: ${new Date(stored.expiresAt).toISOString()}`);
 
