@@ -3,6 +3,7 @@
 JavaScript/TypeScript client for the [kwtSMS SMS API](https://www.kwtsms.com). Send SMS, validate numbers, check balance. Zero runtime dependencies.
 
 [![npm version](https://badge.fury.io/js/kwtsms.svg)](https://www.npmjs.com/package/kwtsms)
+[![CI](https://github.com/boxlinknet/kwtsms-js/actions/workflows/ci.yml/badge.svg)](https://github.com/boxlinknet/kwtsms-js/actions/workflows/ci.yml)
 
 ## Install
 

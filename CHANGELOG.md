@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-03-05
+
+### Added
+
+- CI workflow (`.github/workflows/ci.yml`): runs build and unit tests on Node 18, 20, and 22 on every push and pull request.
+- CodeQL workflow (`.github/workflows/codeql.yml`): automated static analysis for JavaScript security vulnerabilities.
+- Dependabot (`.github/dependabot.yml`): weekly automated pull requests for npm devDependencies and GitHub Actions version updates.
+- `SECURITY.md`: vulnerability reporting policy and security properties.
+- CI status badge in `README.md`.
+
+### Changed
+
+- Minimum Node.js version raised from 16 to 18. Node 16 reached end-of-life in September 2023.
+- npm keywords expanded: added `otp`, `nodejs`, `bulk-sms`, `sms-gateway`.
+
+### Security
+
+- Source maps (`.map` files) removed from the published npm package. They added 160 KB of build artifacts with no value to consumers.
+- npm publish now uses `--provenance`: generates a SLSA attestation linking each published version to its exact GitHub commit.
+
 ## [0.2.1] - 2026-03-05
 
 ### Added
@@ -122,7 +142,8 @@ Initial release of the `kwtsms` JavaScript/TypeScript client library.
 - TypeScript declarations (`dist/index.d.ts`)
 - Zero runtime dependencies
 
-[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/boxlinknet/kwtsms-js/compare/v0.1.1...v0.1.2
