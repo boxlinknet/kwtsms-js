@@ -84,8 +84,17 @@ export class KwtSMS {
    * Create a KwtSMS client.
    *
    * @param username  API username (NOT your account mobile number)
-   * @param password  API password
+   * @param password  API password (stored as a private field, never serialised)
    * @param options   senderId, testMode, logFile
+   *
+   * IMPORTANT — Logging and privacy:
+   * When logFile is set (default: 'kwtsms.log'), every API call is recorded to disk
+   * in JSONL format. Log entries include the full request payload: mobile numbers
+   * and message text (including OTP codes). Passwords are always masked as "***".
+   *
+   * For OTP use cases or any scenario where message bodies are sensitive, either:
+   *   - Set logFile: '' to disable logging entirely, or
+   *   - Ensure your log file has appropriate access controls (chmod 600)
    */
   constructor(username: string, password: string, options: KwtSMSOptions = {}) {
     if (!username || !password) {

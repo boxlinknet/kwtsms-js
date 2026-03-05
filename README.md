@@ -319,6 +319,8 @@ Before going live, verify all of these:
 [ ] Monitoring on failed sends and error rate spikes
 ```
 
+- **OTP / sensitive messages:** set `logFile: ''` to disable logging, or ensure `kwtsms.log` has `chmod 600` — log entries include message bodies and phone numbers (passwords are always masked)
+
 ## Error Codes
 
 | Code | Meaning | Action |

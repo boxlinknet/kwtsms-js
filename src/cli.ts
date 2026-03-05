@@ -153,7 +153,7 @@ async function runSetup(envFile = '.env'): Promise<void> {
 
   // Log file
   const defaultLog = existing['KWTSMS_LOG_FILE'] ?? 'kwtsms.log';
-  console.log('\nAPI call logging (passwords are always masked):');
+  console.log('\nAPI call logging (passwords masked; message bodies and phone numbers ARE recorded):');
   if (defaultLog) console.log(`  Current: ${defaultLog}`);
   console.log('  Type "off" to disable logging.');
   const logInput = await ask(`  Log file path [${defaultLog || 'off'}]: `);
