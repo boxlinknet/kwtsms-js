@@ -20,3 +20,6 @@ node_modules/
 Thumbs.db
 
 .claude
+
+# Git worktrees
+.worktrees
