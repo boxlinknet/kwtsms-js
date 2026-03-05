@@ -188,8 +188,13 @@ export class KwtSMS {
   // ── balance ───────────────────────────────────────────────────────────────
 
   /**
-   * Get current balance via /balance/ API call.
-   * Returns cached value if API call fails and a cached value exists.
+   * Get current balance via a /balance/ API call (calls verify() internally).
+   *
+   * Returns the live balance on success.
+   * If the API call fails and a cached value exists from a previous verify() or send(),
+   * returns the cached value (which may be stale). Returns null if no cached value exists.
+   *
+   * To distinguish live vs stale: call verify() directly — it returns [ok, balance, error].
    */
   async balance(): Promise<number | null> {
     const [ok, bal] = await this.verify();
@@ -329,8 +334,11 @@ export class KwtSMS {
       }
     }
 
+    // Deduplicate normalised numbers (e.g. '+96598765432' and '0096598765432' both → '96598765432')
+    const uniqueValid = [...new Set(validNumbers)];
+
     // All numbers failed local validation — return error, never crash
-    if (validNumbers.length === 0) {
+    if (uniqueValid.length === 0) {
       const desc =
         invalid.length === 1
           ? invalid[0].error
@@ -355,13 +363,13 @@ export class KwtSMS {
 
     let result: SendResult | BulkSendResult;
 
-    if (validNumbers.length > BATCH_SIZE) {
-      result = await this._sendBulk(validNumbers, cleaned, effectiveSender);
+    if (uniqueValid.length > BATCH_SIZE) {
+      result = await this._sendBulk(uniqueValid, cleaned, effectiveSender);
     } else {
       const payload = {
         ...this._creds,
         sender: effectiveSender,
-        mobile: validNumbers.join(','),
+        mobile: uniqueValid.join(','),
         message: cleaned,
         test: this.testMode ? '1' : '0',
       };
