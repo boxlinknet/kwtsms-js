@@ -82,5 +82,17 @@ export async function verifyOtpHandler(request: NextRequest): Promise<NextRespon
   return NextResponse.json(result, { status: result.retryAfter ? 429 : 400 });
 }
 
-// Export as Next.js route handlers (rename these files in your project):
+// ── How to use in your Next.js project ───────────────────────────────────────
+//
+// Each handler goes in its own route file:
+//
+// app/api/auth/send-otp/route.ts:
+//   export { sendOtpHandler as POST };
+//
+// app/api/auth/verify-otp/route.ts:
+//   export { verifyOtpHandler as POST };
+//
+// (Do NOT put both in the same file — each route needs its own route.ts)
+
+// For send-otp route file (app/api/auth/send-otp/route.ts):
 export { sendOtpHandler as POST };
