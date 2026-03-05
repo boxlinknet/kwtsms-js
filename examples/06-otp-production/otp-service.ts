@@ -63,6 +63,12 @@ export interface OtpRecord {
  */
 export interface OtpStore {
   get(phone: string): Promise<OtpRecord | null>;
+  /**
+   * Persist (or overwrite) the OTP record for this phone number.
+   * IMPORTANT: If your store uses TTLs (Redis, etc.), reset the TTL on every
+   * call — not only on the first write. A resend creates a new record with a
+   * fresh expiresAt, so the TTL must reflect the new expiry.
+   */
   set(phone: string, record: OtpRecord): Promise<void>;
   delete(phone: string): Promise<void>;
   /**
@@ -189,6 +195,12 @@ async function checkRateLimit(
   memHits.push(now);
   memRateLimits.set(key, memHits);
 
+  // NOTE: Tier-1 counter is incremented before Tier-2 is checked.
+  // If Tier-2 rejects the request, the Tier-1 counter still advances.
+  // Effect: a DB-blocked request "uses up" a Tier-1 slot without sending an OTP.
+  // This only over-restricts (never under-restricts) — acceptable for security,
+  // but means Tier-1 may block before Tier-2 would on a multi-instance setup.
+
   // Tier 2: DB-backed (optional — only if adapter implements it)
   if (store.getRateLimit && store.setRateLimit) {
     const dbHits = (await store.getRateLimit(key)).filter((t) => t > windowStart);
@@ -313,7 +325,10 @@ export function createOtpService(config: OtpServiceConfig): OtpService {
     );
 
     if (result.result !== 'OK') {
-      // Roll back stored record if SMS fails — don't leave a dangling record
+      // Roll back stored record if SMS fails — don't leave a dangling record.
+      // NOTE: Rate-limit counters (IP + phone) are NOT rolled back. A failed
+      // send still counts toward the per-hour quota. This is intentional —
+      // transient SMS errors should not open an unlimited retry window.
       await store.delete(phone);
       return { success: false, error: result.description ?? 'Failed to send OTP. Please try again.' };
     }
