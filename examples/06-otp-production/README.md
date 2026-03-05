@@ -108,7 +108,7 @@ See `usage/` for copy-paste files for your framework.
 
 ---
 
-## Input Validation — The Full Picture
+## Input Validation: The Full Picture
 
 Phone numbers go through 5 layers of validation before any SMS is sent:
 
@@ -378,12 +378,12 @@ HCAPTCHA_SECRET=your_hcaptcha_secret
 
 Before going live, confirm:
 
-- [ ] `KWTSMS_LOG_FILE=` (empty) — OTP codes must NOT be logged
+- [ ] `KWTSMS_LOG_FILE=` (empty): OTP codes must NOT be logged
 - [ ] CAPTCHA enabled in production (`TURNSTILE_SECRET` or `HCAPTCHA_SECRET` set)
 - [ ] `trust proxy` configured correctly if behind nginx/Cloudflare (Express/Fastify)
 - [ ] `.env` file has `chmod 600` permissions
 - [ ] Using SQLite/Drizzle/Prisma adapter (not memory) in production
-- [ ] OTP codes are hashed — verify `bcrypt.compare` is used, not `===`
+- [ ] OTP codes are hashed: verify `bcrypt.compare` is used, not `===`
 - [ ] `appName` set to your real app name (telecom compliance)
 - [ ] `KWTSMS_TEST_MODE=0` in production (live mode)
 - [ ] Running on HTTPS in production (tokens interceptable over HTTP)

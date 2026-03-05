@@ -98,7 +98,7 @@ Get current balance. Returns `number | null`.
 const bal = await sms.balance();
 ```
 
-> **Tip:** Never call `balance()` after `send()`. The send response already includes `balance-after`. Save it — no extra API call needed.
+> **Tip:** Never call `balance()` after `send()`. The send response already includes `balance-after`. Save it. No extra API call needed.
 
 ### `sms.send(mobile, message, sender?)`
 Send SMS to one or more numbers. Validates inputs and cleans the message automatically.
@@ -114,7 +114,7 @@ const result = await sms.send(['96598765432', '+96512345678'], 'Hello all!');
 const result = await sms.send('96598765432', 'Alert!', 'OTHER-ID');
 ```
 
-Phone numbers are normalized automatically — `+`, `00`, spaces, dashes, Arabic digits all handled.
+Phone numbers are normalized automatically: `+`, `00`, spaces, dashes, and Arabic digits are all handled.
 
 For >200 numbers: automatically split into batches of 200 with 0.5s delay between batches.
 
@@ -299,7 +299,7 @@ const serverTime = new Date(result['unix-timestamp'] * 1000);
 
 **For OTP, always use Transactional.** Using Promotional for OTP means messages to DND numbers are silently blocked and credits are still deducted.
 
-`KWT-SMS` is a shared test sender — never use in production.
+`KWT-SMS` is a shared test sender. Never use in production.
 
 ## Security Checklist
 
@@ -319,7 +319,7 @@ Before going live, verify all of these:
 [ ] Monitoring on failed sends and error rate spikes
 ```
 
-- **OTP / sensitive messages:** set `logFile: ''` to disable logging, or ensure `kwtsms.log` has `chmod 600` — log entries include message bodies and phone numbers (passwords are always masked)
+- **OTP / sensitive messages:** set `logFile: ''` to disable logging, or ensure `kwtsms.log` has `chmod 600`. Log entries include message bodies and phone numbers (passwords are always masked).
 
 ## Error Codes
 
@@ -362,4 +362,4 @@ git push && git push --tags
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

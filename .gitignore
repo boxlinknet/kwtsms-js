@@ -27,5 +27,3 @@ Thumbs.db
 # Git worktrees
 .worktrees
 
-# GitHub config — already tracked; ignore future local-only changes
-.github/
