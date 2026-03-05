@@ -18,7 +18,7 @@
  */
 
 import http from 'node:http';
-import { KwtSMS } from '../src/index.js';
+import { KwtSMS, normalizePhone } from '../src/index.js';
 import { randomInt } from 'node:crypto';
 
 // ── Lightweight HTTP server using node:http (no Express dependency needed here)
@@ -119,7 +119,7 @@ async function handleSendOtp(
   }
 
   // 5. Resend cooldown check
-  const existing = otpStore.get(phone);
+  const existing = otpStore.get(normalizePhone(phone));
   const now = Date.now();
   if (existing && now < existing.resendAllowedAt) {
     const retryAfter = Math.ceil((existing.resendAllowedAt - now) / 1000);
@@ -137,7 +137,7 @@ async function handleSendOtp(
   }
 
   // 7. Store OTP
-  otpStore.set(phone, {
+  otpStore.set(normalizePhone(phone), {
     code,
     expiresAt: now + OTP_TTL_MS,
     resendAllowedAt: now + RESEND_COOLDOWN_MS,
@@ -157,7 +157,7 @@ async function handleVerifyOtp(
     return { status: 400, body: { error: 'phone and code are required' } };
   }
 
-  const record = otpStore.get(phone);
+  const record = otpStore.get(normalizePhone(phone));
   const now = Date.now();
 
   if (!record) {
@@ -167,7 +167,7 @@ async function handleVerifyOtp(
     return { status: 400, body: { error: 'Code already used — request a new one' } };
   }
   if (now > record.expiresAt) {
-    otpStore.delete(phone);
+    otpStore.delete(normalizePhone(phone));
     return { status: 400, body: { error: 'Code expired — request a new one' } };
   }
   if (code.trim() !== record.code) {
