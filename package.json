@@ -50,7 +50,9 @@
     "node": ">=16.0.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^25.3.3",
+    "bcryptjs": "^3.0.3",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
