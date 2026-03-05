@@ -16,7 +16,7 @@ pnpm add kwtsms
 bun add kwtsms
 ```
 
-Works in Node.js 16+, Bun, Next.js, and any JavaScript/TypeScript runtime.
+Works in Node.js 16+ and Bun. Uses Node.js built-in modules (`node:https`, `node:fs`).
 
 ## Quick Start
 
@@ -318,6 +318,8 @@ Before going live, verify all of these:
 [ ] Admin notification on low balance
 [ ] Monitoring on failed sends and error rate spikes
 ```
+
+- **OTP / sensitive messages:** set `logFile: ''` to disable logging, or ensure `kwtsms.log` has `chmod 600` — log entries include message bodies and phone numbers (passwords are always masked)
 
 ## Error Codes
 

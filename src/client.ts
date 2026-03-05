@@ -43,21 +43,43 @@ export interface SendResult extends ApiResponse {
 export interface BulkSendResult {
   result: 'OK' | 'PARTIAL' | 'ERROR';
   bulk: true;
+  /** Number of batches sent (each batch is up to 200 numbers). */
   batches: number;
+  /** Total number of recipients across all successful batches. */
   numbers: number;
+  /** Total SMS credits consumed across all successful batches. */
   'points-charged': number;
+  /** Available balance after the last successful batch, or null if all batches failed. */
   'balance-after': number | null;
+  /** Message IDs for each successful batch. */
   'msg-ids': string[];
+  /** Per-batch error details for failed batches. */
   errors: Array<{ batch: number; code: string; description: string }>;
+  /** Numbers that failed local pre-validation (never sent to API). */
   invalid?: InvalidEntry[];
+  /** Error code from first failed batch — mirrors SendResult shape for uniform error handling. */
+  code?: string;
+  /** Error description from first failed batch — mirrors SendResult shape for uniform error handling. */
+  description?: string;
 }
 
 export interface ValidateResult {
+  /** Numbers validated OK by the API. Normalised format (digits only, no prefix). */
   ok: string[];
+  /**
+   * Invalid numbers. Mixed format:
+   * - Numbers rejected by the API appear in normalised format (digits only).
+   * - Numbers rejected by local pre-validation appear as the original input string.
+   * Use `rejected` for structured details on locally-rejected entries.
+   */
   er: string[];
+  /** Numbers with no route. Normalised format. */
   nr: string[];
+  /** Raw API response, or null if the API was not called. */
   raw: ApiResponse | null;
+  /** Error message if the API call failed, or null on success. */
   error: string | null;
+  /** Details for numbers rejected by local validation before the API call. */
   rejected: InvalidEntry[];
 }
 
@@ -65,14 +87,14 @@ export interface ValidateResult {
 
 export class KwtSMS {
   readonly username: string;
-  readonly password: string;
+  #password: string;
   readonly senderId: string;
   readonly testMode: boolean;
   readonly logFile: string;
 
   /** Cached balance from last verify() / send() call. */
-  private _cachedBalance: number | null = null;
-  private _cachedPurchased: number | null = null;
+  protected _cachedBalance: number | null = null;
+  protected _cachedPurchased: number | null = null;
 
   /** Available balance from the last verify() or send() call. */
   get cachedBalance(): number | null { return this._cachedBalance; }
@@ -84,15 +106,24 @@ export class KwtSMS {
    * Create a KwtSMS client.
    *
    * @param username  API username (NOT your account mobile number)
-   * @param password  API password
+   * @param password  API password (stored as a private field, never serialised)
    * @param options   senderId, testMode, logFile
+   *
+   * IMPORTANT — Logging and privacy:
+   * When logFile is set (default: 'kwtsms.log'), every API call is recorded to disk
+   * in JSONL format. Log entries include the full request payload: mobile numbers
+   * and message text (including OTP codes). Passwords are always masked as "***".
+   *
+   * For OTP use cases or any scenario where message bodies are sensitive, either:
+   *   - Set logFile: '' to disable logging entirely, or
+   *   - Ensure your log file has appropriate access controls (chmod 600)
    */
   constructor(username: string, password: string, options: KwtSMSOptions = {}) {
     if (!username || !password) {
       throw new Error('username and password are required');
     }
     this.username = username;
-    this.password = password;
+    this.#password = password;
     this.senderId = options.senderId ?? 'KWT-SMS';
     this.testMode = options.testMode ?? false;
     this.logFile = options.logFile ?? 'kwtsms.log';
@@ -128,7 +159,7 @@ export class KwtSMS {
   }
 
   private get _creds(): Record<string, string> {
-    return { username: this.username, password: this.password };
+    return { username: this.username, password: this.#password };
   }
 
   // ── verify ────────────────────────────────────────────────────────────────
@@ -157,8 +188,13 @@ export class KwtSMS {
   // ── balance ───────────────────────────────────────────────────────────────
 
   /**
-   * Get current balance via /balance/ API call.
-   * Returns cached value if API call fails and a cached value exists.
+   * Get current balance via a /balance/ API call (calls verify() internally).
+   *
+   * Returns the live balance on success.
+   * If the API call fails and a cached value exists from a previous verify() or send(),
+   * returns the cached value (which may be stale). Returns null if no cached value exists.
+   *
+   * To distinguish live vs stale: call verify() directly — it returns [ok, balance, error].
    */
   async balance(): Promise<number | null> {
     const [ok, bal] = await this.verify();
@@ -298,8 +334,11 @@ export class KwtSMS {
       }
     }
 
+    // Deduplicate normalised numbers (e.g. '+96598765432' and '0096598765432' both → '96598765432')
+    const uniqueValid = [...new Set(validNumbers)];
+
     // All numbers failed local validation — return error, never crash
-    if (validNumbers.length === 0) {
+    if (uniqueValid.length === 0) {
       const desc =
         invalid.length === 1
           ? invalid[0].error
@@ -310,16 +349,28 @@ export class KwtSMS {
       } as SendResult;
     }
 
+    // Pre-flight: clean message and reject if empty (e.g. emoji-only input)
+    const cleaned = cleanMessage(message);
+    if (!cleaned) {
+      return {
+        result: 'ERROR' as const,
+        code: 'ERR009',
+        description: 'Message is empty after cleaning. If your message contained only emojis or HTML, remove them.',
+        action: 'Provide a non-empty message text.',
+        ...(invalid.length > 0 ? { invalid } : {}),
+      } as SendResult;
+    }
+
     let result: SendResult | BulkSendResult;
 
-    if (validNumbers.length > BATCH_SIZE) {
-      result = await this._sendBulk(validNumbers, message, effectiveSender);
+    if (uniqueValid.length > BATCH_SIZE) {
+      result = await this._sendBulk(uniqueValid, cleaned, effectiveSender);
     } else {
       const payload = {
         ...this._creds,
         sender: effectiveSender,
-        mobile: validNumbers.join(','),
-        message: cleanMessage(message),
+        mobile: uniqueValid.join(','),
+        message: cleaned,
         test: this.testMode ? '1' : '0',
       };
       try {
@@ -356,7 +407,6 @@ export class KwtSMS {
     message: string,
     sender: string,
   ): Promise<BulkSendResult> {
-    const cleanedMsg = cleanMessage(message);
     const batches: string[][] = [];
     for (let i = 0; i < numbers.length; i += BATCH_SIZE) {
       batches.push(numbers.slice(i, i + BATCH_SIZE));
@@ -374,7 +424,7 @@ export class KwtSMS {
         ...this._creds,
         sender,
         mobile: batch.join(','),
-        message: cleanedMsg,
+        message,
         test: this.testMode ? '1' : '0',
       };
 
@@ -432,7 +482,7 @@ export class KwtSMS {
     const overall: 'OK' | 'PARTIAL' | 'ERROR' =
       okCount === batches.length ? 'OK' : okCount === 0 ? 'ERROR' : 'PARTIAL';
 
-    return {
+    const bulkResult: BulkSendResult = {
       result: overall,
       bulk: true,
       batches: batches.length,
@@ -442,5 +492,12 @@ export class KwtSMS {
       'msg-ids': msgIds,
       errors,
     };
+
+    if (errors.length > 0) {
+      bulkResult.code = errors[0].code;
+      bulkResult.description = errors[0].description;
+    }
+
+    return bulkResult;
   }
 }

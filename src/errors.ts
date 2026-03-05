@@ -1,6 +1,7 @@
 /**
  * kwtSMS API error codes and developer-friendly action messages.
- * Maps every error code the API can return to a "what to do next" message.
+ * Maps the 28 error codes defined by the kwtSMS API (ERR001–ERR033,
+ * with ERR014–ERR018 undefined by the API) plus ERR_INVALID_INPUT for local validation.
  */
 
 export const API_ERRORS: Readonly<Record<string, string>> = {
@@ -17,6 +18,7 @@ export const API_ERRORS: Readonly<Record<string, string>> = {
   ERR011: 'Insufficient balance for this send. Buy more credits at kwtsms.com.',
   ERR012: 'Message is too long (over 6 SMS pages). Shorten your message.',
   ERR013: 'Send queue is full (1000 messages). Wait a moment and try again.',
+  // Note: ERR014–ERR018 are not defined by the kwtSMS API (these codes do not exist).
   ERR019: 'No delivery reports found for this message.',
   ERR020: 'Message ID does not exist. Make sure you saved the msg-id from the send response.',
   ERR021: 'No delivery report available for this message yet.',
