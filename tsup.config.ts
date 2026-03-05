@@ -8,8 +8,8 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,
-  target: 'node16',
+  target: 'node18',
   splitting: false,
-  sourcemap: true,
+  sourcemap: false,
   minify: false,
 });
