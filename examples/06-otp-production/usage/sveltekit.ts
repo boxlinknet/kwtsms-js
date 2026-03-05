@@ -79,5 +79,17 @@ export const verifyOtpPOST: RequestHandler = async ({ request, getClientAddress 
   return json(result, { status: result.retryAfter ? 429 : 400 });
 };
 
-// Export as SvelteKit route handlers (rename in your project):
+// ── How to use these handlers in your SvelteKit project ──────────────────────
+//
+// Each handler goes in its own +server.ts file:
+//
+// src/routes/api/auth/send-otp/+server.ts:
+//   export { sendOtpPOST as POST };
+//
+// src/routes/api/auth/verify-otp/+server.ts:
+//   export { verifyOtpPOST as POST };
+//
+// (Do NOT put both in the same file — each route needs its own +server.ts)
+
+// For send-otp file:
 export { sendOtpPOST as POST };
