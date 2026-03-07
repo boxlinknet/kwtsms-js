@@ -27,6 +27,7 @@ KWTSMS_TEST_MODE=1
 
 | File | What it covers |
 |------|----------------|
+| [`00-raw-api.ts`](./00-raw-api.ts) | Raw HTTP calls to every kwtSMS endpoint, no library, copy-paste ready |
 | [`01-basic-usage.ts`](./01-basic-usage.ts) | Create client, verify credentials, check balance, send SMS |
 | [`02-otp-flow.ts`](./02-otp-flow.ts) | OTP send + verify, expiry, resend cooldown, replay protection |
 | [`03-bulk-sms.ts`](./03-bulk-sms.ts) | 500+ numbers, auto-batching, partial failure, msg-id tracking |
@@ -39,6 +40,7 @@ Each `.ts` file has a companion `.md` file with detailed explanation, code snipp
 
 ```bash
 # From repo root:
+npx tsx examples/00-raw-api.ts           # raw HTTP calls, no library
 npx tsx examples/01-basic-usage.ts
 npx tsx examples/02-otp-flow.ts
 npx tsx examples/03-bulk-sms.ts
