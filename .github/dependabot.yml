@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Keep npm devDependencies up to date
+  # Keep npm devDependencies up to date (grouped into one PR)
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -9,8 +9,12 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - dependencies
+    groups:
+      dev-dependencies:
+        patterns:
+          - "*"
 
-  # Keep GitHub Actions pinned versions up to date
+  # Keep GitHub Actions pinned versions up to date (grouped into one PR)
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -19,3 +23,7 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - dependencies
+    groups:
+      actions:
+        patterns:
+          - "*"

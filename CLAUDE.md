@@ -33,10 +33,9 @@ Run these steps in order for every release. No skipping.
 4. Stage and commit: `git add CHANGELOG.md package.json` then `git commit -m "chore: release vX.Y.Z"`
 5. Create tag: `git tag vX.Y.Z`
 6. Push commit: `git push origin master`
-7. Push tag: `git push origin vX.Y.Z` (triggers GitHub Actions which builds, tests, and publishes to npm automatically)
+7. Push tag: `git push origin vX.Y.Z` (triggers GitHub Actions which builds, tests, publishes to npm, and creates the GitHub Release with notes from CHANGELOG automatically)
 8. Verify the Actions run succeeded: `gh run list --limit 3`
-9. Create GitHub Release: `gh release create vX.Y.Z --title "vX.Y.Z" --latest --notes "..."` (copy notes from the new CHANGELOG section)
-10. Verify npm: `npm view kwtsms version`
+9. Verify npm: `npm view kwtsms version`
 
 ### Conventional commit types
 
