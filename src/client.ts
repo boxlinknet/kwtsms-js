@@ -239,6 +239,32 @@ export class KwtSMS {
     }
   }
 
+  // ── status ───────────────────────────────────────────────────────────────
+
+  /**
+   * Get delivery status for a sent message via /report/.
+   * Never throws. Returns enriched error dict on failure.
+   *
+   * Common error codes:
+   *   ERR019: No delivery reports found
+   *   ERR020: Message ID does not exist
+   *   ERR021: Report not ready yet
+   *   ERR030: Message stuck in queue with error (normal for test mode)
+   */
+  async status(msgId: string): Promise<ApiResponse> {
+    try {
+      const data = await apiRequest('status', { ...this._creds, msgid: msgId }, this.logFile);
+      return enrichError(data);
+    } catch (e) {
+      return {
+        result: 'ERROR',
+        code: 'NETWORK',
+        description: (e as Error).message,
+        action: 'Check your internet connection and try again.',
+      };
+    }
+  }
+
   // ── validate ──────────────────────────────────────────────────────────────
 
   /**

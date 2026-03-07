@@ -9,6 +9,7 @@
  *   kwtsms senderid
  *   kwtsms coverage
  *   kwtsms send <mobile> <message> [--sender SENDER_ID]
+ *   kwtsms status <msg-id>
  *   kwtsms validate <number> [number2 ...]
  */
 
@@ -207,6 +208,7 @@ function printUsage(): void {
   console.log('  senderid                               — list sender IDs on this account');
   console.log('  coverage                               — list active country prefixes');
   console.log('  send <mobile> <message> [--sender ID]  — send SMS');
+  console.log('  status <msg-id>                        — check delivery status');
   console.log('  validate <number> [number2 ...]        — validate phone numbers');
   console.log('');
   console.log('Examples:');
@@ -313,32 +315,36 @@ async function main(): Promise<void> {
       }
     }
 
-    if (result.result === 'OK') {
+    if ('bulk' in result) {
+      // Bulk send result (PARTIAL or OK)
+      const bulk = result as BulkSendResult;
+      console.log(
+        `  Sent  |  result: ${bulk.result}  |  batches: ${String(bulk.batches)}  |  numbers: ${String(bulk.numbers)}  |  balance-after: ${String(bulk['balance-after'])}`,
+      );
+      if (bulk['msg-ids'].length > 0) {
+        console.log(`  msg-ids: ${bulk['msg-ids'].join(', ')}`);
+      }
+      if (bulk.errors.length > 0) {
+        for (const err of bulk.errors) {
+          console.error(`  Batch ${err.batch} error: ${err.code}: ${err.description}`);
+        }
+      }
+      if (sms.testMode) {
+        console.log('  (test send — check kwtsms.com Queue to confirm; delete to recover credits)');
+      }
+      if (bulk.result === 'ERROR') process.exit(1);
+    } else if (result.result === 'OK') {
       if ('msg-id' in result) {
         console.log(
           `  Sent  |  msg-id: ${String(result['msg-id'])}  |  balance-after: ${String(result['balance-after'])}`,
-        );
-      } else if ('msg-ids' in result) {
-        console.log(
-          `  Sent  |  batches: ${String(result['batches'])}  |  numbers: ${String(result['numbers'])}  |  balance-after: ${String(result['balance-after'])}`,
         );
       }
       if (sms.testMode) {
         console.log('  (test send — check kwtsms.com Queue to confirm; delete to recover credits)');
       }
     } else {
-      // BulkSendResult has no code/description/action — use type narrowing
-      if ('bulk' in result) {
-        const bulk = result as BulkSendResult;
-        if (bulk.errors.length > 0) {
-          console.error(`  Failed (bulk): ${bulk.errors[0].code}: ${bulk.errors[0].description}`);
-        } else {
-          console.error(`  Failed: ${bulk.result}`);
-        }
-      } else {
-        console.error(`  Failed: ${String(result.code ?? 'UNKNOWN')}: ${String(result.description ?? '')}`);
-        if (result.action) console.error(`  Action: ${result.action}`);
-      }
+      console.error(`  Failed: ${String(result.code ?? 'UNKNOWN')}: ${String(result.description ?? '')}`);
+      if (result.action) console.error(`  Action: ${result.action}`);
       process.exit(1);
     }
 
@@ -357,6 +363,20 @@ async function main(): Promise<void> {
       }
     }
     if (report.error) console.log(`  Error: ${report.error}`);
+
+  } else if (cmd === 'status') {
+    if (argv.length < 2) {
+      console.error('Usage: kwtsms status <msg-id>');
+      process.exit(1);
+    }
+    const result = await sms.status(argv[1]);
+    if (result.result === 'OK') {
+      console.log(`  msg-id: ${String(result['msg-id'] ?? argv[1])}  |  status: ${String(result['status'] ?? 'unknown')}`);
+    } else {
+      console.error(`  Error: ${String(result.code ?? 'UNKNOWN')}: ${String(result.description ?? '')}`);
+      if (result.action) console.error(`  Action: ${result.action}`);
+      process.exit(1);
+    }
 
   } else if (cmd === 'senderid') {
     const result = await sms.senderids();

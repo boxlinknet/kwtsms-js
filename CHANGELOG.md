@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-03-07
+
+### Added
+
+- `status(msgId)` method: check the queue status of a sent message via `/API/status/`. Returns enriched error responses. Never throws.
+- `kwtsms status <msg-id>` CLI command: check message status from the command line.
+- CLI bulk send output: shows per-batch msg-ids, handles PARTIAL results, displays per-batch errors.
+- `test/cli.test.ts`: 13 CLI unit tests covering help output, unknown commands, argument validation, local validation (no network), and test mode warning.
+- `test/integration.test.ts`: live API bulk send tests for 250 numbers (client library and CLI), balance tracking, and ERR030 status checks.
+- `examples/00-raw-api.ts`: raw HTTP calls to all 6 kwtSMS endpoints using only `node:https`. No library, copy-paste ready.
+- `examples/00-raw-api.md`: step-by-step documentation for the raw API example.
+- README sections: About kwtSMS, Prerequisites, Phone Number Formats, Test Mode, Sender ID, Server Timezone, Input Sanitization, Implementation Checklist, What's Handled Automatically, Examples table, Testing, FAQ, Help & Support with all links.
+
+### Changed
+
+- README title changed from "kwtsms" to "kwtSMS JavaScript Client".
+- README consolidated and expanded to match the structure of other kwtSMS client libraries.
+- Integration test credentials use language-prefixed fake values (`js_wronguser`, `js_wrongpass`).
+
+### Fixed
+
+- `src/client.ts`: status endpoint changed from `/API/report/` to `/API/status/` (correct REST/JSON endpoint).
+
 ## [0.2.2] - 2026-03-05
 
 ### Added
@@ -142,7 +165,8 @@ Initial release of the `kwtsms` JavaScript/TypeScript client library.
 - TypeScript declarations (`dist/index.d.ts`)
 - Zero runtime dependencies
 
-[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.1.2...v0.2.0

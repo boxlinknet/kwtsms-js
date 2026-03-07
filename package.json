@@ -1,6 +1,6 @@
 {
   "name": "kwtsms",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "JavaScript/TypeScript client for the kwtSMS SMS API (kwtsms.com). Send SMS, validate numbers, check balance. Zero runtime dependencies.",
   "type": "module",
   "main": "dist/index.cjs",
@@ -24,7 +24,7 @@
   "scripts": {
     "build": "tsup",
     "test": "node --import tsx/esm --test 'test/**/*.test.ts'",
-    "test:unit": "node --import tsx/esm --test test/phone.test.ts test/message.test.ts test/errors.test.ts test/client.test.ts test/env.test.ts test/logger.test.ts",
+    "test:unit": "node --import tsx/esm --test test/phone.test.ts test/message.test.ts test/errors.test.ts test/client.test.ts test/env.test.ts test/logger.test.ts test/cli.test.ts",
     "test:integration": "node --import tsx/esm --test test/integration.test.ts",
     "prepublishOnly": "npm run build && npm run test:unit"
   },
