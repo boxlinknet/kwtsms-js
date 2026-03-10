@@ -24,6 +24,9 @@ Thumbs.db
 
 .claude
 
+# Tests (local only)
+test/
+
 # Git worktrees
 .worktrees
 
