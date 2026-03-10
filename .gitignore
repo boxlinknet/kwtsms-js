@@ -23,6 +23,7 @@ node_modules/
 Thumbs.db
 
 .claude
+CLAUDE.md
 
 # Tests (local only)
 test/
