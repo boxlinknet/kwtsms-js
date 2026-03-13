@@ -21,7 +21,16 @@
 export { KwtSMS } from './client.js';
 
 // Utility functions (useful for callers who want to validate/clean before calling send)
-export { normalizePhone, validatePhoneInput } from './phone.js';
+export {
+  normalizePhone,
+  validatePhoneInput,
+  validatePhoneFormat,
+  findCountryCode,
+  maskPhone,
+  PHONE_RULES,
+  COUNTRY_NAMES,
+} from './phone.js';
+export type { PhoneRule } from './phone.js';
 export { cleanMessage } from './message.js';
 export { API_ERRORS, enrichError } from './errors.js';
 

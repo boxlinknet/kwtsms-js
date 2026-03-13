@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-03-13
+
+### Added
+
+- `PHONE_RULES`: country-specific validation table covering 80+ countries (GCC, Levant, Africa, Europe, Asia, Americas, Oceania). Validates local number length and mobile prefix per country.
+- `COUNTRY_NAMES`: country code to display name mapping for error messages.
+- `findCountryCode(normalized)`: longest-match lookup (3-digit, then 2-digit, then 1-digit) against `PHONE_RULES`.
+- `validatePhoneFormat(normalized)`: validates a normalized E.164 number against country rules. Numbers with no matching country code pass through unchanged.
+- `maskPhone(phone)`: masks a normalized number for display, showing the first 4 and last 3 digits.
+- `PhoneRule` TypeScript interface: exported type for country rule entries.
+
+### Changed
+
+- `validatePhoneInput()`: now calls `validatePhoneFormat()` after generic E.164 length checks, providing country-level error messages (e.g., "Invalid Kuwait number: expected 8 digits after +965, got 7").
+- `validatePhoneInput()`: automatically strips a redundant local leading zero when the country code is recognized. For example, `9660559123456` (966 + 0559123456) is corrected to `966559123456` and returned as valid.
+
 ## [0.3.0] - 2026-03-07
 
 ### Added
@@ -165,7 +181,8 @@ Initial release of the `kwtsms` JavaScript/TypeScript client library.
 - TypeScript declarations (`dist/index.d.ts`)
 - Zero runtime dependencies
 
-[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.0...v0.2.1
