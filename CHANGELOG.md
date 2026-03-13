@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `KwtSMS` constructor: throw `Error` when `senderId` is explicitly passed as empty string or exceeds 20 characters. Previously an empty or oversized sender ID was silently accepted and would cause an API rejection with no clear error.
+- `KwtSMS` constructor: throw `Error` when `senderId` is explicitly passed as empty string or exceeds 11 characters (GSM standard). Previously an empty or oversized sender ID was silently accepted and would cause an API rejection with no clear error.
 - `maskPhone()`: return `****` for inputs shorter than 7 digits. Previously, inputs of 5 or 6 digits produced overlapping prefix and suffix with digits exposed (e.g. a 5-digit input would return 7 characters with duplicated digits).
 
 ## [0.5.0] - 2026-03-13

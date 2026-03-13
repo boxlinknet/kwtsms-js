@@ -126,8 +126,8 @@ export class KwtSMS {
       if (options.senderId.length === 0) {
         throw new Error('senderId cannot be an empty string');
       }
-      if (options.senderId.length > 20) {
-        throw new Error('senderId cannot exceed 20 characters');
+      if (options.senderId.length > 11) {
+        throw new Error('senderId cannot exceed 11 characters (GSM standard)');
       }
     }
     this.username = username;
