@@ -217,14 +217,46 @@ if (result.result === 'OK') {
 ## Utility Functions
 
 ```typescript
-import { normalizePhone, validatePhoneInput, cleanMessage } from 'kwtsms';
+import {
+  normalizePhone, validatePhoneInput, validatePhoneFormat,
+  findCountryCode, maskPhone, cleanMessage,
+  PHONE_RULES, COUNTRY_NAMES,
+} from 'kwtsms';
+import type { PhoneRule } from 'kwtsms';
 
-normalizePhone('+96598765432');     // → '96598765432'
-normalizePhone('00 965 9876 5432'); // → '96598765432'
+// Normalize: strip formatting, convert Arabic digits, remove leading zeros
+normalizePhone('+96598765432');      // → '96598765432'
+normalizePhone('00 965 9876 5432');  // → '96598765432'
+normalizePhone('9660559123456');     // → '9660559123456' (local zero stripped later)
 
+// Validate: returns [valid, error, normalizedNumber]
 const [valid, error, normalized] = validatePhoneInput('+96598765432');
 // [true, null, '96598765432']
 
+validatePhoneInput('9660559123456');
+// [true, null, '966559123456']  — strips local leading zero automatically
+
+validatePhoneInput('+96512345');
+// [false, "Invalid Kuwait number: expected 8 digits after +965, got 5", ...]
+
+// Country-specific format check (used internally by validatePhoneInput)
+validatePhoneFormat('96598765432');   // { valid: true }
+validatePhoneFormat('9659123');       // { valid: false, error: 'Invalid Kuwait number: ...' }
+
+// Find country code from a normalized number (longest-match: 3-digit → 2-digit → 1-digit)
+findCountryCode('96598765432');  // → '965'
+findCountryCode('14155551234');  // → '1'
+findCountryCode('unknown');      // → null
+
+// Mask for display: show first 4 and last 3 digits, **** for numbers under 7 digits
+maskPhone('96598765432');  // → '9659****432'
+maskPhone('123');          // → '****'
+
+// Country rules table and names (read-only, 80+ countries)
+PHONE_RULES['965'];        // → { localLengths: [8], mobileStartDigits: ['4','5','6','9'] }
+COUNTRY_NAMES['965'];      // → 'Kuwait'
+
+// Message cleaning
 cleanMessage('Hello 😀 <b>World</b> \uFEFF'); // → 'Hello  World '
 ```
 
@@ -261,8 +293,14 @@ All formats are accepted and normalized automatically:
 | `٩٦٥ ٩٨٧٦ ٥٤٣٢` | `96598765432` | Yes |
 | `٩٦٥-٩٨٧٦-٥٤٣٢` | `96598765432` | Yes |
 | `965٩٨٧٦٥٤٣٢` | `96598765432` | Yes |
+| `9660559123456` (966 + local 0559…) | `966559123456` | Yes — local leading zero stripped |
+| `965098765432` (965 + local 098…) | `96598765432` | Yes — local leading zero stripped |
 | `123456` (too short) | rejected | No |
 | `user@gmail.com` | rejected | No |
+| `96512345` (Kuwait, wrong length) | rejected | No — country rule: 8 digits after +965 |
+| `9661234567` (Saudi, starts with 1) | rejected | No — country rule: must start with 5 |
+
+Country-specific validation covers 80+ countries (GCC, Levant, Arab world, Europe, Asia, Americas, Africa, Oceania). Numbers from countries not in the rules table pass through with generic E.164 validation (7–15 digits).
 
 ## Test Mode
 
@@ -272,7 +310,7 @@ All formats are accepted and normalized automatically:
 
 ## Sender ID
 
-A **Sender ID** is the name that appears as the sender on the recipient's phone (e.g., "MY-APP" instead of a random number).
+A **Sender ID** is the name that appears as the sender on the recipient's phone (e.g., "MY-APP" instead of a random number). Maximum 11 characters (GSM standard). Passing a longer value throws immediately from the constructor.
 
 | | Promotional | Transactional |
 |--|-------------|---------------|
@@ -388,6 +426,8 @@ Before going live, test these scenarios:
 ## What's Handled Automatically
 
 - **Phone normalization**: `+`, `00`, spaces, dashes, dots, parentheses stripped. Arabic-Indic digits converted. Leading zeros removed.
+- **Country-specific validation**: 80+ countries validated against local number length and mobile prefix rules (e.g., Kuwait must be 8 digits starting with 4, 5, 6, or 9). Numbers from unknown countries pass through with generic E.164 validation.
+- **Local leading zero correction**: Numbers entered as country code + local-with-zero (e.g., `9660559123456`) are automatically corrected to `966559123456`.
 - **Duplicate phone removal**: If the same number appears multiple times (in different formats), it is sent only once.
 - **Message cleaning**: Emojis removed (codepoint-safe via `Array.from()`). Hidden control characters (BOM, zero-width spaces, directional marks) removed. HTML tags stripped. Arabic-Indic digits in message body converted to Latin.
 - **Batch splitting**: More than 200 numbers are automatically split into batches of 200 with 0.5s delay between batches.
@@ -444,24 +484,7 @@ npm run test:integration
 
 ## Publishing (for maintainers)
 
-```bash
-# 1. Bump version
-npm version patch   # 0.1.0 → 0.1.1  (bug fix)
-npm version minor   # 0.1.x → 0.2.0  (new feature)
-npm version major   # 0.x.x → 1.0.0  (breaking change)
-
-# 2. Build
-npm run build
-
-# 3. Dry run — review what will be uploaded
-npm publish --dry-run
-
-# 4. Publish
-npm publish --access public
-
-# 5. Tag and push
-git push && git push --tags
-```
+Releases are automated via GitHub Actions. Pushing a `v*` tag triggers a build, test, and `npm publish --provenance` run. Follow the release checklist in `CLAUDE.md`.
 
 ## FAQ
 

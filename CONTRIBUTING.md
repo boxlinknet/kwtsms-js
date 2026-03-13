@@ -24,7 +24,7 @@ npm install
 npm test
 ```
 
-`npm test` runs the unit tests. All 68 tests should pass with no live credentials required.
+`npm test` runs the unit tests. All 98 tests should pass with no live credentials required.
 
 ## Running Tests
 
@@ -52,7 +52,6 @@ npm run build
 #   dist/index.js    (ESM)
 #   dist/index.cjs   (CommonJS)
 #   dist/index.d.ts  (TypeScript declarations)
-#   dist/cli.js      (CLI, ESM, executable)
 ```
 
 ## Project Structure
@@ -60,28 +59,31 @@ npm run build
 ```
 src/
   client.ts      — KwtSMS class (main entry point)
-  phone.ts       — phone normalization and validation
+  phone.ts       — phone normalization, validation, PHONE_RULES, maskPhone
   message.ts     — message cleaning (emoji, HTML, hidden chars)
   errors.ts      — error code map and enrichError()
   request.ts     — node:https wrapper
   env.ts         — .env file parser
   logger.ts      — JSONL request logger
   index.ts       — public exports
-  cli.ts         — CLI entry point
 
-test/
-  errors.test.ts
+test/            — gitignored (local only)
   phone.test.ts
   message.test.ts
+  errors.test.ts
   client.test.ts
+  env.test.ts
+  logger.test.ts
   integration.test.ts
 
 examples/
+  00-raw-api.ts / .md
   01-basic-usage.ts / .md
   02-otp-flow.ts / .md
   03-bulk-sms.ts / .md
   04-express-endpoint.ts / .md
   05-nextjs-route.ts / .md
+  06-otp-production/ (full production OTP example)
 ```
 
 ## Making Changes
@@ -135,12 +137,12 @@ test: cover Arabic digit normalization edge cases
 
 ## Pull Request Process
 
-1. Fork the repository and create a branch from `main`
+1. Fork the repository and create a branch from `master`
 2. Make your changes following the style guidelines above
 3. Run `npm test` — all tests must pass
 4. Run `npm run build` — build must succeed without warnings
 5. Update `CHANGELOG.md` under `[Unreleased]` with a brief description
-6. Open a pull request against `main`
+6. Open a pull request against `master`
 
 ### PR Checklist
 
