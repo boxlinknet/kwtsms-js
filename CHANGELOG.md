@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `src/client.ts`: status endpoint changed from `/API/report/` to `/API/status/` (correct REST/JSON endpoint).
+- `src/client.ts`: status endpoint corrected to `/API/status/`.
 
 ## [0.2.2] - 2026-03-05
 

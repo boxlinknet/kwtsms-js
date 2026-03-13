@@ -126,7 +126,7 @@ Phone number formats accepted — the library normalizes automatically:
 ### 5. Save the msg-id
 
 Always save `result['msg-id']` from a successful send — you need it later to
-check delivery status or get a delivery report:
+check its queue status later:
 
 ```typescript
 const msgId = result['msg-id'];  // e.g. "f4c841adee210f31307633ceaebff2ec"

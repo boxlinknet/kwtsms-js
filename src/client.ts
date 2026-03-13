@@ -250,13 +250,13 @@ export class KwtSMS {
   // ── status ───────────────────────────────────────────────────────────────
 
   /**
-   * Get delivery status for a sent message via /report/.
+   * Get queue status for a sent message via /API/status/.
    * Never throws. Returns enriched error dict on failure.
    *
    * Common error codes:
-   *   ERR019: No delivery reports found
+   *   ERR019: No status found for this message
    *   ERR020: Message ID does not exist
-   *   ERR021: Report not ready yet
+   *   ERR021: Status not ready yet
    *   ERR030: Message stuck in queue with error (normal for test mode)
    */
   async status(msgId: string): Promise<ApiResponse> {

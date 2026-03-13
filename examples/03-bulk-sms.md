@@ -86,7 +86,7 @@ const result = await sms.send(sendable, 'Hello from MYAPP!');
 
 ## Save msg-ids
 
-Always save the `msg-ids` from a successful send to your database. These are needed to check delivery status or request delivery reports later:
+Always save the `msg-ids` from a successful send to your database. These are needed to check queue status later via `sms.status(msgId)`:
 
 ```typescript
 // After sending

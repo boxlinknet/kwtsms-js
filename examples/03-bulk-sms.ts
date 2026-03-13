@@ -4,7 +4,7 @@
  * Demonstrates:
  *   - Sending to 500+ numbers (auto-batched into groups of 200)
  *   - Handling partial failure (some batches succeed, some fail)
- *   - Tracking msg-ids for later delivery reports
+ *   - Tracking msg-ids for later status checks
  *   - Validating numbers before sending
  *   - Reading batch errors
  *

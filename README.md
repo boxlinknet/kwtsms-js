@@ -174,7 +174,7 @@ For >200 numbers: automatically split into batches of 200 with 0.5s delay betwee
 }
 ```
 
-> **Always save `msg-id` immediately.** You need it for status checks and delivery reports. It cannot be retrieved later.
+> **Always save `msg-id` immediately.** You need it for status checks. It cannot be retrieved later.
 
 ### `sms.validate(phones[])`
 Validate phone numbers before sending.
