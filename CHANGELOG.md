@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-03-13
+
+### Fixed
+
+- `src/client.ts`: corrected JSDoc comment from `Node.js 16+` to `Node.js 18+` to match the actual engine requirement in `package.json`.
+- `src/client.ts`, `README.md`, `CHANGELOG.md`, `examples/`: removed all references to the non-existent `/API/report/` endpoint. Status checks use `/API/status/` only.
+
+### Changed
+
+- `.github/workflows/dependabot-auto-merge.yml`: pinned `dependabot/fetch-metadata` to full commit SHA for supply chain hardening.
+- `README.md`, `CONTRIBUTING.md`, `SECURITY.md`: updated for v0.5.x state.
+
 ## [0.5.1] - 2026-03-13
 
 ### Fixed

@@ -1,6 +1,6 @@
 {
   "name": "kwtsms",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "JavaScript/TypeScript client for the kwtSMS SMS API (kwtsms.com). Send SMS, validate numbers, check balance. Zero runtime dependencies.",
   "type": "module",
   "main": "dist/index.cjs",
