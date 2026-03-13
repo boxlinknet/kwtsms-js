@@ -81,11 +81,6 @@ KWTSMS_TEST_MODE=1
 KWTSMS_LOG_FILE=kwtsms.log
 ```
 
-Or use the interactive CLI wizard:
-```bash
-npx kwtsms setup
-```
-
 Or pass credentials directly:
 ```typescript
 const sms = new KwtSMS('your_api_user', 'your_api_pass', {
@@ -268,30 +263,6 @@ All formats are accepted and normalized automatically:
 | `965٩٨٧٦٥٤٣٢` | `96598765432` | Yes |
 | `123456` (too short) | rejected | No |
 | `user@gmail.com` | rejected | No |
-
-## CLI
-
-```bash
-kwtsms setup                                         # interactive setup wizard
-kwtsms verify                                        # test credentials, show balance
-kwtsms balance                                       # show balance
-kwtsms senderid                                      # list sender IDs
-kwtsms coverage                                      # list active country prefixes
-kwtsms send 96598765432 "Your OTP is: 123456"
-kwtsms send 96598765432,96512345678 "Hello" --sender MY-APP
-kwtsms status f4c841adee210f31307633ceaebff2ec       # check message queue status
-kwtsms validate +96598765432 0096512345678 abc
-```
-
-Install globally for direct use:
-```bash
-npm install -g kwtsms
-```
-
-Or use without installing:
-```bash
-npx kwtsms setup
-```
 
 ## Test Mode
 
