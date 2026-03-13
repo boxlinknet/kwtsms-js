@@ -411,10 +411,10 @@ export function validatePhoneFormat(normalized: string): { valid: boolean; error
  * Mask a phone number for display, showing only the first 4 and last 3 digits.
  */
 export function maskPhone(phone: string): string {
-  if (phone.length <= 4) return '****';
+  if (phone.length < 7) return '****';
   const prefix = phone.slice(0, 4);
   const suffix = phone.slice(-3);
-  const masked = '*'.repeat(Math.max(0, phone.length - 7));
+  const masked = '*'.repeat(phone.length - 7);
   return `${prefix}${masked}${suffix}`;
 }
 

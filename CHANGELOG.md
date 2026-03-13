@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-03-13
+
+### Fixed
+
+- `KwtSMS` constructor: throw `Error` when `senderId` is explicitly passed as empty string or exceeds 20 characters. Previously an empty or oversized sender ID was silently accepted and would cause an API rejection with no clear error.
+- `maskPhone()`: return `****` for inputs shorter than 7 digits. Previously, inputs of 5 or 6 digits produced overlapping prefix and suffix with digits exposed (e.g. a 5-digit input would return 7 characters with duplicated digits).
+
 ## [0.5.0] - 2026-03-13
 
 ### Removed
@@ -187,7 +194,8 @@ Initial release of the `kwtsms` JavaScript/TypeScript client library.
 - TypeScript declarations (`dist/index.d.ts`)
 - Zero runtime dependencies
 
-[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/boxlinknet/kwtsms-js/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/boxlinknet/kwtsms-js/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/boxlinknet/kwtsms-js/compare/v0.2.2...v0.3.0

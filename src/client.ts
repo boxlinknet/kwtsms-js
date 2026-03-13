@@ -122,6 +122,14 @@ export class KwtSMS {
     if (!username || !password) {
       throw new Error('username and password are required');
     }
+    if (options.senderId !== undefined) {
+      if (options.senderId.length === 0) {
+        throw new Error('senderId cannot be an empty string');
+      }
+      if (options.senderId.length > 20) {
+        throw new Error('senderId cannot exceed 20 characters');
+      }
+    }
     this.username = username;
     this.#password = password;
     this.senderId = options.senderId ?? 'KWT-SMS';
