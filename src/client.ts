@@ -1,7 +1,7 @@
 /**
  * KwtSMS API client.
  *
- * Zero external dependencies. Node.js 16+.
+ * Zero external dependencies. Node.js 18+.
  *
  * Server timezone: Asia/Kuwait (GMT+3).
  * unix-timestamp values in API responses are GMT+3 server time, not UTC.
